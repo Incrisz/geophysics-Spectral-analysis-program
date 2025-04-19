@@ -1,29 +1,55 @@
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load Excel file
-df = pd.read_excel("guyok.xlsx")
+# App Configuration
+st.set_page_config(page_title="Spectral Analysis", layout="centered")
+st.title("📈 Spectral Analysis Program")
+st.markdown("### 👨‍💻 Developed by **Incrisz**")
 
-# Clean and convert columns to numeric, forcing invalid entries to NaN
-x = pd.to_numeric(df.iloc[:, 0], errors='coerce')  # X (CYC/K_unit)
-y = pd.to_numeric(df.iloc[:, 1], errors='coerce')  # Y (Ln_P)
+# File Upload
+uploaded_file = st.file_uploader("📤 Upload your Excel file (.xlsx)", type="xlsx")
 
-# Filter out rows where either x or y is NaN
-valid_data = df.dropna(subset=[df.columns[0], df.columns[1]])
+if uploaded_file:
+    try:
+        df = pd.read_excel(uploaded_file)
 
-# Re-convert the cleaned columns
-x = pd.to_numeric(valid_data.iloc[:, 0], errors='coerce')
-y = pd.to_numeric(valid_data.iloc[:, 1], errors='coerce')
+        # Clean the data
+        x = pd.to_numeric(df.iloc[:, 0], errors='coerce')
+        y = pd.to_numeric(df.iloc[:, 1], errors='coerce')
+        valid_data = df[(~x.isna()) & (~y.isna())]
+        x = valid_data.iloc[:, 0]
+        y = valid_data.iloc[:, 1]
 
-# Further filter out any remaining non-numeric values from x and y
-valid_data = valid_data[(x.notna()) & (y.notna())]
+        # Optional Display
+        if st.checkbox("👁️ Show Raw Data"):
+            st.dataframe(df.head())
 
-# Plot the cleaned data
-plt.figure(figsize=(8, 5))
-plt.plot(valid_data.iloc[:, 0], valid_data.iloc[:, 1], marker='o', linestyle='-', color='blue')
-plt.title('Guyok 2D Radial Spectrum')
-plt.xlabel('X (CYC/K_unit) - 2D RADIALLY')
-plt.ylabel('Y (Ln_P) - SPECTRUM')
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+        if st.checkbox("👁️ Show Cleaned Data"):
+            st.dataframe(valid_data.head())
+
+        # Plot Settings
+        plot_title = st.text_input("📌 Enter Plot Title", "Spectral Analysis Plot")
+        x_label = st.text_input("🧭 X-axis Label", "X (CYC/K_unit) - 2D RADIALLY")
+        y_label = st.text_input("🧭 Y-axis Label", "Y (Ln_P) - SPECTRUM")
+        line_color = st.color_picker("🎨 Pick a line color", "#0000FF")
+        line_style = st.selectbox("📈 Select line style", ["-", "--", "-.", ":"])
+
+        # Plotting
+        fig, ax = plt.subplots()
+        ax.plot(x, y, marker='o', linestyle=line_style, color=line_color)
+        ax.set_title(plot_title)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+        ax.grid(True)
+        st.subheader("📊 Plot")
+        st.pyplot(fig)
+
+        # Statistics
+        st.subheader("📉 Summary Statistics")
+        st.write(valid_data.describe())
+
+    except Exception as e:
+        st.error(f"❌ An error occurred while processing the file: {e}")
+else:
+    st.info("Please upload an Excel file to begin.")
