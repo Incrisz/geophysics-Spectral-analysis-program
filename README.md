@@ -16,25 +16,28 @@ Follow the steps below to set up and run the scripts.
 git clone https://github.com/Incrisz/geophysics-Spectral-analysis-program.git
 cd geophysics-Spectral-analysis-program
 
-2. Set Up a Virtual Environment
-On Linux/macOS:
-
+## 2. Set Up a Virtual Environment
+## On Linux/macOS:
 python3 -m venv myenv
 source myenv/bin/activate
-On Windows:
 
+
+## On Windows:
 python -m venv myenv
 myenv\Scripts\activate
-3. Install Dependencies
 
+
+#  3. Install Dependencies
 pip install numpy pandas matplotlib scipy openpyxl
-4. Run Scripts
-To run any of the scripts, simply use the following command:
+
+
+## 4. Run Scripts
+## To run any of the scripts, simply use the following command:
 
 
 python <script_name>.py
-Example:
 
+## Example:
 python guyok.py      # Run Guyok script
 python kaltungo.py   # Run Kaltungo script
 python momgo.py      # Run Momgo script
