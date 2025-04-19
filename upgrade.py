@@ -67,6 +67,28 @@ if uploaded_file:
                 ax.legend()
 
                 st.subheader("📐 Linear Regression Results")
+
+                # Show working for slope using first and last point
+                x1 = x[0][0]
+                x2 = x[-1][0]
+                y1 = y[0]
+                y2 = y[-1]
+                manual_slope = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
+
+                # st.markdown("### 🧮 Slope Calculation (Manual Working)")
+                st.write(f"Let the first point be (x₁, y₁) = ({x1:.4f}, {y1:.4f})")
+                st.write(f"Let the last point be (x₂, y₂) = ({x2:.4f}, {y2:.4f})")
+
+                st.latex(r"""
+                m = \frac{y_2 - y_1}{x_2 - x_1}
+                """)
+                st.latex(r"""
+                m = \frac{%0.4f - %0.4f}{%0.4f - %0.4f}
+                """ % (y2, y1, x2, x1))
+                st.latex(r"""
+                m = %0.4f
+                """ % manual_slope)
+
                 st.write(f"**Slope (m):** `{slope:.4f}`")
                 st.write(f"**Intercept (b):** `{intercept:.4f}`")
 
