@@ -84,3 +84,6 @@ pip install numpy pandas matplotlib scipy openpyxl streamlit
 
 ## run it 
 streamlit run web.py
+
+## for mobile to access it
+streamlit run web.py --server.address=0.0.0.0 --server.port=8501
