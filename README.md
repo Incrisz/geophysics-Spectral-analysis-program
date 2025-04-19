@@ -75,7 +75,7 @@ pip install numpy pandas matplotlib scipy openpyxl
 ## On Linux/macOS:
 git clone https://github.com/Incrisz/geophysics-Spectral-analysis-program.git
 cd geophysics-Spectral-analysis-program
-apt install python3.12-venv
+sudo apt install python3.12-venv
 python3 -m venv myenv
 source myenv/bin/activate
 
