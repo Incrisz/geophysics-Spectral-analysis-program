@@ -1,4 +1,7 @@
 import streamlit as st
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams['font.family'] = 'DejaVu Sans'  # Or try a system emoji font if available
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
@@ -77,6 +80,51 @@ if uploaded_file:
             # Statistics
             st.subheader("📉 Summary Statistics")
             st.write(valid_data[[x_column, y_column]].describe())
+
+            # -------------------------------
+            # 📡 Spectral Analysis (FFT)
+            # -------------------------------
+            st.subheader("📡 Spectral Analysis (FFT)")
+
+            # Sampling interval input (time between data points)
+            sampling_interval = st.number_input("🕒 Sampling Interval (e.g., 1 for unit steps)", min_value=0.0001, value=1.0, step=0.1, format="%.4f")
+
+            # FFT Calculation
+            N = len(y)
+            T = sampling_interval
+            yf = np.fft.fft(y)
+            xf = np.fft.fftfreq(N, T)[:N // 2]
+
+            # Frequency domain plot
+            fig_fft, ax_fft = plt.subplots()
+            ax_fft.plot(xf, 2.0 / N * np.abs(yf[:N // 2]), color='green')
+            ax_fft.set_title("🧠 Frequency Spectrum")
+            ax_fft.set_xlabel("Frequency (Hz)")
+            ax_fft.set_ylabel("Magnitude")
+            ax_fft.grid(True)
+            st.pyplot(fig_fft)
+
+            # Optional: Frequency components table
+            if st.checkbox("📄 Show Frequency Components Table"):
+                freq_data = pd.DataFrame({
+                    "Frequency (Hz)": xf,
+                    "Magnitude": 2.0 / N * np.abs(yf[:N // 2])
+                })
+                st.dataframe(freq_data.head(20))
+
+            # Optional: Show as wavelength
+            if st.checkbox("🔁 Show Wavelength Instead of Frequency"):
+                # Avoid division by zero
+                safe_xf = np.where(xf == 0, np.nan, xf)
+                wavelength = 1 / safe_xf
+                fig_wave, ax_wave = plt.subplots()
+                ax_wave.plot(wavelength, 2.0 / N * np.abs(yf[:N // 2]), color='purple')
+                ax_wave.set_title("🔬 Spectrum by Wavelength")
+                ax_wave.set_xlabel("Wavelength")
+                ax_wave.set_ylabel("Magnitude")
+                ax_wave.grid(True)
+                st.pyplot(fig_wave)
+
 
     except Exception as e:
         st.error(f"❌ An error occurred while processing the file: {e}")
