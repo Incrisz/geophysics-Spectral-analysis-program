@@ -40,5 +40,5 @@ python <script_name>.py
 ## Example:
 python guyok.py      # Run Guyok script
 python kaltungo.py   # Run Kaltungo script
-python momgo.py      # Run Momgo script
+python dong.py      # Run Momgo script
 python lau.py        # Run Lau script
