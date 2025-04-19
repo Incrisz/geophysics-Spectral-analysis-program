@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import numpy as np
+from scipy.interpolate import interp1d
+
 
 # App Configuration
 st.set_page_config(page_title="Spectral Analysis", layout="centered")
@@ -43,6 +45,7 @@ if uploaded_file:
             if st.checkbox("👁️ Show Cleaned Data"):
                 st.dataframe(valid_data[[x_column, y_column]].head())
 
+
             # Plot Settings
             plot_title = st.text_input("📌 Enter Plot Title", "Spectral Analysis Plot")
             x_label = st.text_input("🧭 X-axis Label", x_column)
@@ -54,6 +57,25 @@ if uploaded_file:
             # Plotting
             fig, ax = plt.subplots()
             ax.plot(x, y, marker='o', linestyle=line_style, color=line_color, label='Data')
+
+            # Interpolation 
+            if st.checkbox("🔧 Apply Interpolation"):
+                interp_type = st.selectbox("📐 Select Interpolation Type", ['linear', 'quadratic', 'cubic'])
+
+                # Ensure x is flattened
+                x_flat = x.flatten()
+
+                try:
+                    f_interp = interp1d(x_flat, y, kind=interp_type)
+                    x_interp = np.linspace(x_flat.min(), x_flat.max(), 500)
+                    y_interp = f_interp(x_interp)
+
+                    ax.plot(x_interp, y_interp, color='orange', linestyle=':', label=f'{interp_type.capitalize()} Interpolation')
+                    ax.legend()
+
+                    st.success(f"{interp_type.capitalize()} interpolation applied and plotted.")
+                except Exception as e:
+                    st.error(f"Interpolation error: {e}")
 
             # Regression Line
             if show_regression:
