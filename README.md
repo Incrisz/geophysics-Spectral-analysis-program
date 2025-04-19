@@ -32,7 +32,7 @@ source myenv/Scripts/activate
 
 ## 3. Install Dependencies
 python -m pip install --upgrade pip
-pip install numpy pandas matplotlib scipy openpyxl
+pip install numpy pandas matplotlib scipy openpyxl scikit-learn streamlit
 
 
 
@@ -66,7 +66,7 @@ python3 -m venv myenv
 source myenv/bin/activate
 
 ## 3. Install Dependencies
-pip install numpy pandas matplotlib scipy openpyxl 
+pip install numpy pandas matplotlib scipy openpyxl scikit-learn
 
 
 
