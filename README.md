@@ -27,7 +27,7 @@ python -m venv myenv
 myenv\Scripts\activate
 
 
-#  3. Install Dependencies
+## 3. Install Dependencies
 pip install numpy pandas matplotlib scipy openpyxl
 
 
