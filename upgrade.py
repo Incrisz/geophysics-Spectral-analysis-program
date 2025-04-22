@@ -98,8 +98,8 @@ if uploaded_file:
                 manual_slope = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
 
                 # st.markdown("### 🧮 Slope Calculation (Manual Working)")
-                # st.write(f"Let the first point be (x₁, y₁) = ({x1:.4f}, {y1:.4f})")
-                # st.write(f"Let the last point be (x₂, y₂) = ({x2:.4f}, {y2:.4f})")
+                st.write(f"Let the first point be (x₁, y₁) = ({x1:.4f}, {y1:.4f})")
+                st.write(f"Let the last point be (x₂, y₂) = ({x2:.4f}, {y2:.4f})")
 
                 # st.latex(r"""
                 # m = \frac{y_2 - y_1}{x_2 - x_1}

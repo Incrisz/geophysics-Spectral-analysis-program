@@ -80,7 +80,8 @@ python3 -m venv myenv
 source myenv/bin/activate
 
 ## 3. Install Dependencies
-pip install numpy pandas matplotlib scipy openpyxl streamlit scikit-learn
+pip install numpy pandas matplotlib scipy openpyxl streamlit scikit-learn reportlab pyproj folium streamlit-folium
+
 
 ## run it 
 streamlit run web.py
