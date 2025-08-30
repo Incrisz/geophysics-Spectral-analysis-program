@@ -1,0 +1,13 @@
+numpy
+pandas
+matplotlib
+scipy
+openpyxl
+streamlit
+scikit-learn
+reportlab
+pyproj
+folium
+streamlit-folium
+rioxarray
+plotly

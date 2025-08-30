@@ -12,7 +12,11 @@ class GrdProcessor(Processor):
             rds = rioxarray.open_rasterio(self.uploaded_file)
 
             # Squeeze the data to remove the band dimension for plotting
-            data = rds.squeeze().values
+            rds_squeezed = rds.squeeze()
+
+            # Coarsen the data to reduce the size
+            coarsened_rds = rds_squeezed.coarsen(x=10, y=10, boundary='trim').mean()
+            data = coarsened_rds.values
 
             fig = go.Figure(data=go.Heatmap(z=data, colorscale='Viridis'))
 
