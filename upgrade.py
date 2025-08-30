@@ -29,7 +29,7 @@ PROCESSOR_MAP = {
 
 def main():
     st.set_page_config(page_title="Spectral Analysis", layout="centered")
-    st.title("📈 Spectral Analysis Program For Group 3")
+    st.title("📈 Spectral Analysis Program")
     st.markdown("### 👨‍💻 Developed by **Incrisz**")
 
     allowed_extensions = list(PROCESSOR_MAP.keys())
