@@ -25,7 +25,6 @@ class ExcelProcessor(Processor):
             x_vals = df_clean[x_column].values
             y_vals = df_clean[y_column].values
 
-            # --- Interactive Plot Section ---
             st.subheader("📊 Interactive Plot")
             plot_title = st.text_input("📌 Enter Plot Title", "Interactive Plot")
             x_label = st.text_input("🧭 X-axis Label", x_column)
@@ -37,11 +36,6 @@ class ExcelProcessor(Processor):
             fig = go.Figure()
             fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='markers', name='Data'))
             fig.update_layout(title=plot_title, xaxis_title=x_label, yaxis_title=y_label)
-
-            st.write("Click on two points on the plot to draw a line.")
-
-            slope = 0
-            intercept = 0
 
             if len(st.session_state.points) == 2:
                 p1 = st.session_state.points[0]
@@ -58,25 +52,27 @@ class ExcelProcessor(Processor):
                 y_line = slope * x_line + intercept
                 fig.add_trace(go.Scatter(x=x_line, y=y_line, mode='lines', name=f'y={slope:.2f}x+{intercept:.2f}'))
 
-            selected_points = plotly_events(fig, key="plotly_events")
+                st.subheader("📐 Calculated Line")
+                st.write(f"**Slope (m):** `{slope:.4f}`")
+                st.write(f"**Intercept (b):** `{intercept:.4f}`")
 
-            if selected_points:
-                point = (selected_points[0]['x'], selected_points[0]['y'])
-                if point not in st.session_state.points:
-                    st.session_state.points.append(point)
-                    st.rerun()
+            # The main plot area
+            if len(st.session_state.points) < 2:
+                st.write("Click on two points on the plot to draw a line.")
+                selected_points = plotly_events(fig, key="plotly_events")
+                if selected_points:
+                    point = (selected_points[0]['x'], selected_points[0]['y'])
+                    if point not in st.session_state.points:
+                        st.session_state.points.append(point)
+                        st.rerun()
+            else:
+                st.plotly_chart(fig)
 
             if st.button("Clear selected points"):
                 st.session_state.points = []
                 st.rerun()
 
             st.write(f"Selected points: {len(st.session_state.points)}/2")
-
-            if len(st.session_state.points) == 2:
-                st.subheader("📐 Calculated Line")
-                st.write(f"**Slope (m):** `{slope:.4f}`")
-                st.write(f"**Intercept (b):** `{intercept:.4f}`")
-                st.session_state.points = []
 
             # --- Summary Statistics Section ---
             st.subheader("📉 Summary Statistics")
