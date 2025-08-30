@@ -11,3 +11,4 @@ folium
 streamlit-folium
 rioxarray
 plotly
+streamlit-plotly-events
