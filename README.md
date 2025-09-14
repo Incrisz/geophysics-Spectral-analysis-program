@@ -37,3 +37,19 @@ pip install -r requirements.txt
 streamlit run upgrade.py
 ```
 Open the URL displayed in the terminal to interact with the application.
+
+## Makefile commands
+Use the provided `Makefile` to simplify common tasks:
+```bash
+make install      # install dependencies
+make run          # start the Streamlit app
+make docker-build # build the Docker image
+make docker-run   # run the app in a container
+```
+
+## Docker
+To build and run the app using Docker directly:
+```bash
+docker build -t spectral-app .
+docker run -p 8501:8501 spectral-app
+```
