@@ -1,9 +1,6 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-rcParams['font.family'] = 'DejaVu Sans'  # Or try a system emoji font if available
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
 import numpy as np
 from scipy.interpolate import interp1d
@@ -11,15 +8,21 @@ from scipy.interpolate import interp1d
 
 # App Configuration
 st.set_page_config(page_title="Spectral Analysis", layout="centered")
-st.title("📈 Spectral Analysis Program For Group 3")
+st.title("📈 Spectral Analysis Program (500L project)")
 st.markdown("### 👨‍💻 Developed by **Incrisz**")
 
 # File Upload
-uploaded_file = st.file_uploader("📤 Upload your Excel file (.xlsx)", type="xlsx")
+uploaded_file = st.file_uploader(
+    "📤 Upload your data file (.xlsx or .txt)",
+    type=["xlsx", "txt"],
+)
 
 if uploaded_file:
     try:
-        df = pd.read_excel(uploaded_file)
+        if uploaded_file.name.endswith(".txt"):
+            df = pd.read_csv(uploaded_file, sep=None, engine="python")
+        else:
+            df = pd.read_excel(uploaded_file)
 
         # Filter numeric columns only
         numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
@@ -37,6 +40,7 @@ if uploaded_file:
 
             x = valid_data[x_column].values.reshape(-1, 1)
             y = valid_data[y_column].values
+            x_flat = x.flatten()
 
             # Optional Display
             if st.checkbox("👁️ Show Raw Data"):
@@ -55,23 +59,36 @@ if uploaded_file:
             show_regression = st.checkbox("📐 Show Linear Regression Line")
 
             # Plotting
-            fig, ax = plt.subplots()
-            ax.plot(x, y, marker='o', linestyle=line_style, color=line_color, label='Data')
+            dash_styles = {"-": "solid", "--": "dash", "-.": "dashdot", ":": "dot"}
+            fig = go.Figure()
+            fig.add_trace(
+                go.Scatter(
+                    x=x_flat,
+                    y=y,
+                    mode='lines+markers',
+                    line=dict(color=line_color, dash=dash_styles.get(line_style, 'solid')),
+                    name='Data'
+                )
+            )
 
             # Interpolation 
             if st.checkbox("🔧 Apply Interpolation"):
                 interp_type = st.selectbox("📐 Select Interpolation Type", ['linear', 'quadratic', 'cubic'])
-
-                # Ensure x is flattened
-                x_flat = x.flatten()
 
                 try:
                     f_interp = interp1d(x_flat, y, kind=interp_type)
                     x_interp = np.linspace(x_flat.min(), x_flat.max(), 500)
                     y_interp = f_interp(x_interp)
 
-                    ax.plot(x_interp, y_interp, color='orange', linestyle=':', label=f'{interp_type.capitalize()} Interpolation')
-                    ax.legend()
+                    fig.add_trace(
+                        go.Scatter(
+                            x=x_interp,
+                            y=y_interp,
+                            mode='lines',
+                            line=dict(color='orange', dash='dot'),
+                            name=f'{interp_type.capitalize()} Interpolation'
+                        )
+                    )
 
                     st.success(f"{interp_type.capitalize()} interpolation applied and plotted.")
                 except Exception as e:
@@ -85,8 +102,15 @@ if uploaded_file:
                 slope = model.coef_[0]
                 intercept = model.intercept_
 
-                ax.plot(x, y_pred, color='red', linestyle='--', label=f'Regression line\ny={slope:.4f}x+{intercept:.4f}')
-                ax.legend()
+                fig.add_trace(
+                    go.Scatter(
+                        x=x_flat,
+                        y=y_pred,
+                        mode='lines',
+                        line=dict(color='red', dash='dash'),
+                        name=f'Regression line\\ny={slope:.4f}x+{intercept:.4f}'
+                    )
+                )
 
                 st.subheader("📐 Linear Regression Results")
 
@@ -114,12 +138,15 @@ if uploaded_file:
                 st.write(f"**Slope (m):** `{slope:.4f}`")
                 st.write(f"**Intercept (b):** `{intercept:.4f}`")
 
-            ax.set_title(plot_title)
-            ax.set_xlabel(x_label)
-            ax.set_ylabel(y_label)
-            ax.grid(True)
+            fig.update_layout(
+                title=plot_title,
+                xaxis_title=x_label,
+                yaxis_title=y_label
+            )
+            fig.update_xaxes(showgrid=True)
+            fig.update_yaxes(showgrid=True)
             st.subheader("📊 Plot")
-            st.pyplot(fig)
+            st.plotly_chart(fig, use_container_width=True)
 
             # Statistics
             st.subheader("📉 Summary Statistics")
@@ -140,13 +167,23 @@ if uploaded_file:
             xf = np.fft.fftfreq(N, T)[:N // 2]
 
             # Frequency domain plot
-            fig_fft, ax_fft = plt.subplots()
-            ax_fft.plot(xf, 2.0 / N * np.abs(yf[:N // 2]), color='green')
-            ax_fft.set_title("🧠 Frequency Spectrum")
-            ax_fft.set_xlabel("Frequency (Hz)")
-            ax_fft.set_ylabel("Magnitude")
-            ax_fft.grid(True)
-            st.pyplot(fig_fft)
+            fig_fft = go.Figure()
+            fig_fft.add_trace(
+                go.Scatter(
+                    x=xf,
+                    y=2.0 / N * np.abs(yf[:N // 2]),
+                    mode='lines',
+                    line=dict(color='green')
+                )
+            )
+            fig_fft.update_layout(
+                title="🧠 Frequency Spectrum",
+                xaxis_title="Frequency (Hz)",
+                yaxis_title="Magnitude"
+            )
+            fig_fft.update_xaxes(showgrid=True)
+            fig_fft.update_yaxes(showgrid=True)
+            st.plotly_chart(fig_fft, use_container_width=True)
 
             # Optional: Frequency components table
             if st.checkbox("📄 Show Frequency Components Table"):
@@ -161,16 +198,26 @@ if uploaded_file:
                 # Avoid division by zero
                 safe_xf = np.where(xf == 0, np.nan, xf)
                 wavelength = 1 / safe_xf
-                fig_wave, ax_wave = plt.subplots()
-                ax_wave.plot(wavelength, 2.0 / N * np.abs(yf[:N // 2]), color='purple')
-                ax_wave.set_title("🔬 Spectrum by Wavelength")
-                ax_wave.set_xlabel("Wavelength")
-                ax_wave.set_ylabel("Magnitude")
-                ax_wave.grid(True)
-                st.pyplot(fig_wave)
+                fig_wave = go.Figure()
+                fig_wave.add_trace(
+                    go.Scatter(
+                        x=wavelength,
+                        y=2.0 / N * np.abs(yf[:N // 2]),
+                        mode='lines',
+                        line=dict(color='purple')
+                    )
+                )
+                fig_wave.update_layout(
+                    title="🔬 Spectrum by Wavelength",
+                    xaxis_title="Wavelength",
+                    yaxis_title="Magnitude"
+                )
+                fig_wave.update_xaxes(showgrid=True)
+                fig_wave.update_yaxes(showgrid=True)
+                st.plotly_chart(fig_wave, use_container_width=True)
 
 
     except Exception as e:
         st.error(f"❌ An error occurred while processing the file: {e}")
 else:
-    st.info("Please upload an Excel file to begin.")
+    st.info("Please upload an Excel or text file to begin.")
