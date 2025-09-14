@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # App Configuration
 st.set_page_config(page_title="Spectral Analysis", layout="centered")
@@ -36,14 +36,24 @@ if uploaded_file:
         line_style = st.selectbox("📈 Select line style", ["-", "--", "-.", ":"])
 
         # Plotting
-        fig, ax = plt.subplots()
-        ax.plot(x, y, marker='o', linestyle=line_style, color=line_color)
-        ax.set_title(plot_title)
-        ax.set_xlabel(x_label)
-        ax.set_ylabel(y_label)
-        ax.grid(True)
+        plot_df = pd.DataFrame({'x': x, 'y': y})
+        dash_styles = {"-": "solid", "--": "dash", "-.": "dashdot", ":": "dot"}
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=plot_df['x'],
+                y=plot_df['y'],
+                mode='lines+markers',
+                line=dict(color=line_color, dash=dash_styles.get(line_style, 'solid'))
+            )
+        )
+        fig.update_layout(
+            title=plot_title,
+            xaxis_title=x_label,
+            yaxis_title=y_label
+        )
         st.subheader("📊 Plot")
-        st.pyplot(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
         # Statistics
         st.subheader("📉 Summary Statistics")
