@@ -53,3 +53,11 @@ To build and run the app using Docker directly:
 docker build -t spectral-app .
 docker run -p 8501:8501 spectral-app
 ```
+
+## Docker Compose
+To build and run the app using Docker Compose:
+```bash
+docker compose up --build
+```
+This will expose the app on http://localhost:8501.
+
